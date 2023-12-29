@@ -1,0 +1,9 @@
+{
+	"clientId": "clientIdDiscord",
+	"clientSecret": "clientSecretDiscord",
+	"port": "port",
+	"secret": "secretForJWT", 
+
+	"token": "tokenDiscord"
+    
+}
