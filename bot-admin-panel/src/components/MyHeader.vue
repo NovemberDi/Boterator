@@ -46,7 +46,8 @@ export default {
              }
   },
   props: {
-    username: {Type: String}
+    username: {Type: String},
+    domen: {type: String}
   },
   methods:{
     // async getImage(){
@@ -55,7 +56,7 @@ export default {
     // console.log(token)
     // if (!token) return
     //   try{
-    //     let answer = await axios.get('http://192.168.0.105:53134/auth/adminImage',{
+    //     let answer = await axios.get('http://85.193.80.63:53134//auth/adminImage',{
     //       headers: {
     //         Authorization: 'Bearer ' + token
     //       },
@@ -75,7 +76,7 @@ export default {
     console.log(token)
     if (!token) return
       try{
-        let answer = await axios.get('http://192.168.0.105:53134/auth/adminData',{
+        let answer = await axios.get(this.domen+'/auth/adminData',{
           headers: {
             Authorization: 'Bearer ' + token
           }});
@@ -148,6 +149,7 @@ header{
   margin-left: 80px;
   color: #b9a5fd;
   margin-bottom:18px;
+  cursor: default;
 }
 .user{
   display: flex;

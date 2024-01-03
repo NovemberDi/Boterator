@@ -4,8 +4,16 @@
   ></MyAuth>
 
   <div v-if="isAutorizate">
-    <MyHeader @setGuild="curentGuild = $event" @logout="logout"></MyHeader>
-    <UsersList :guild="curentGuild" @logout="logout"></UsersList>
+    <MyHeader 
+      :domen="domen"
+      @setGuild="curentGuild = $event" 
+      @logout="logout">
+    </MyHeader>
+    <UsersList 
+      :domen="domen"
+      :guild="curentGuild"
+      @logout="logout">
+     </UsersList>
   </div>
   <div class="footer"></div>
 
@@ -17,10 +25,10 @@ export default {
   name: 'AutorizatePage',
   data(){
       return {
-        // authLink: 'https://discord.com/api/oauth2/authorize?client_id=1175898890533359656&response_type=code&redirect_uri=http%3A%2F%2F192.168.0.105%3A53134&scope=identify',
         isAutorizate: false,
         authLink: null,
         curentGuild: '',
+        domen:''
 
              }
   },
@@ -30,7 +38,7 @@ export default {
   methods:{
     async makeLink(){
            //Делаем ссылку и сохраняем параметр state в sessionStorege
-      let link = await (await axios.get('http://192.168.0.105:53134/auth/link')).data;
+      let link = await (await axios.get(this.domen+'/auth/link')).data;
       let randomString;
       if (sessionStorage.getItem('oauth-state')) {
         randomString = sessionStorage.getItem('oauth-state');
@@ -67,7 +75,7 @@ export default {
     },
     async getToken(code){
       try{
-      let data = await (await axios.post('http://192.168.0.105:53134/auth/login', {code})).data
+      let data = await (await axios.post(this.domen+'/auth/login', {code})).data
       // console.log(data)
       if (data.token) {
         console.log(data.token)
@@ -75,12 +83,13 @@ export default {
         this.isAutorizate = true;
       } else{
         console.log(data.message)
-        logout();
+        this.logout();
       }
       
       } catch(e) { 
         console.log(e)
-        logout();
+        this.logout();
+
       }
     },
     logout(){
@@ -94,10 +103,14 @@ export default {
         this.makeLink();
         this.checkCSRF();
       }
+    },
+    makeDomen(){
+      this.domen = window.location.origin;
     }
   },
 
   mounted(){
+    this.makeDomen();
     this.checkLogin();
 
   }

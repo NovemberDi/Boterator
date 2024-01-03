@@ -49,7 +49,8 @@ export default {
     }
   },
   props: {
-    guild: {type: String, default: ''}
+    guild: {type: String, default: ''},
+    domen: {type: String}
   },
   methods:{
     async auditUsers(){
@@ -63,7 +64,7 @@ export default {
     }
     if (!token) return
       try{
-        let answer = await axios.post('http://192.168.0.105:53134/auth/auditUsers',data,{
+        let answer = await axios.post(this.domen+'/auth/auditUsers',data,{
           headers: {
             Authorization: 'Bearer ' + token
           }
@@ -94,7 +95,7 @@ export default {
     console.log(data.target)
     if (!token) return
       try{
-        let answer = await axios.post('http://192.168.0.105:53134/auth/fixUsers',data,{
+        let answer = await axios.post(this.domen+'/auth/fixUsers',data,{
           headers: {
             Authorization: 'Bearer ' + token
           }
@@ -115,7 +116,7 @@ export default {
     // console.log(token)
     if (!token) return
       try{
-        let answer = await axios.post('http://192.168.0.105:53134/auth/getUsers',data,{
+        let answer = await axios.post(this.domen+'/auth/getUsers',data,{
           headers: {
             Authorization: 'Bearer ' + token
           }
