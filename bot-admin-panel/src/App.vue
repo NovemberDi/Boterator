@@ -4,8 +4,8 @@
   ></MyAuth>
 
   <div v-if="isAutorizate">
-    <MyHeader></MyHeader>
-    <UsersList></UsersList>
+    <MyHeader @setGuild="curentGuild = $event" @logout="logout"></MyHeader>
+    <UsersList :guild="curentGuild" @logout="logout"></UsersList>
   </div>
   <div class="footer"></div>
 
@@ -17,8 +17,10 @@ export default {
   name: 'AutorizatePage',
   data(){
       return {
-        isAutorizate: true,
-        authLink: 'https://discord.com/api/oauth2/authorize?client_id=1025864212066611270&redirect_uri=http%3A%2F%2F192.168.0.105%3A53134&response_type=code&scope=identify',
+        // authLink: 'https://discord.com/api/oauth2/authorize?client_id=1175898890533359656&response_type=code&redirect_uri=http%3A%2F%2F192.168.0.105%3A53134&scope=identify',
+        isAutorizate: false,
+        authLink: null,
+        curentGuild: '',
 
              }
   },
@@ -26,15 +28,17 @@ export default {
 
   },
   methods:{
-    async makeLink(){     //Делаем ссылку и сохраняем параметр state в sessionStorege
+    async makeLink(){
+           //Делаем ссылку и сохраняем параметр state в sessionStorege
+      let link = await (await axios.get('http://192.168.0.105:53134/auth/link')).data;
       let randomString;
       if (sessionStorage.getItem('oauth-state')) {
         randomString = sessionStorage.getItem('oauth-state');
-        this.authLink += `&state=${encodeURIComponent(btoa(randomString))}`;
+        this.authLink = link+`&state=${encodeURIComponent(btoa(randomString))}`;
       } else {
         randomString = generateRandomString();
         sessionStorage.setItem('oauth-state', randomString);
-        this.authLink += `&state=${encodeURIComponent(btoa(randomString))}`;
+        this.authLink = link+`&state=${encodeURIComponent(btoa(randomString))}`;
       }
       function generateRandomString() {
 			let randomString = '';
@@ -71,19 +75,31 @@ export default {
         this.isAutorizate = true;
       } else{
         console.log(data.message)
-        this.isAutorizate = false;
+        logout();
       }
       
       } catch(e) { 
         console.log(e)
-        this.isAutorizate = false;
+        logout();
+      }
+    },
+    logout(){
+      sessionStorage.clear();
+      window.location.href = window.location.origin;
+    },
+    checkLogin(){
+      if (sessionStorage.getItem('token')){
+        this.isAutorizate = true;
+      } else {
+        this.makeLink();
+        this.checkCSRF();
       }
     }
   },
 
   mounted(){
-    this.makeLink(),
-    this.checkCSRF()
+    this.checkLogin();
+
   }
 
 }
@@ -105,6 +121,6 @@ padding: 0;
   color: #ffffff ;
 }
 .footer{
-  height: 60px;
+  height: 30px;
 }
 </style>

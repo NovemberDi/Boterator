@@ -7,7 +7,7 @@
         Авторизация
     </div>
     <img class="user-img" src="./../assets/Boter.png" alt="User">
-    <a class="btn" @click="getData"  :href="`${authLink} `">Войти с Discord</a>
+    <a  v-show="authLink"  class="btn"   :href="`${authLink} `">Войти с Discord</a>
 
 </div>
 </template>

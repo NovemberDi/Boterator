@@ -23,9 +23,14 @@
                 <li><a class="a-desktop" href="#">Команды</a></li>
               </ul>
           </nav>
-          <div class="user">
+          <div class="user dropdown" >
+            <p class="arrow">‹</p>
             <p>{{adminData.username ||'user'}}</p>
             <img class="user-img" :src=" adminData.avatar || defaultImg" alt="User">
+            <div class="dropdown-content" @click="this.$emit('logout')">
+             Выйти
+            </div>
+          
           </div> 
       </header>
 </template>
@@ -77,6 +82,7 @@ export default {
         console.log(answer.data);
         
         this.adminData = answer.data
+        this.$emit('setGuild', answer.data.guilds[0].guildID)
       }catch(err){
         console.log(err.response.status)
         if (err.response.status == 403) this.$emit('logout')
@@ -93,6 +99,41 @@ export default {
 }
 </script>
 <style scoped>
+.arrow{
+  transform: rotate(-90deg);
+  margin-right: 10px;
+  transition: cubic-bezier(0.215, 0.610, 0.355, 1) 200ms;
+  color: #b9a5fd;
+  font-size: 18px;
+}
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    color: #b9a5fd;
+    background-color: #1E1E23;
+    width: 100%;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    transform: translate(0,100%);
+    padding: 8px;
+  }
+  .dropdown-content:hover {
+color:#F5F6FA;
+  }
+
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  .dropdown:hover .arrow {
+    transform: rotate(90deg);
+  }
+
+
+
+
+
 header{
   display: flex;
   background-color: #1E1E23;
@@ -115,7 +156,12 @@ header{
   cursor: pointer;
   position: absolute;
   right: 0;
-  top: 0;  
+  top: 0;
+  height: 100%;  
+
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
 .user-img{
   margin: 10px;

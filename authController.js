@@ -1,9 +1,9 @@
 const {client} = require('./bot.js')
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const {checkUser} = require("./actions/checkUser.js");
+const {fixUsers, auditUsers} = require("./actions/checkUser.js");
 let { targetRole } = require('./bot-params.json');
-const {secret} = require("./config");
+const {secret, authLink} = require("./config");
 const {listOfUsers, adminData} = require('./store/store.js')
 
 
@@ -21,16 +21,21 @@ let makeUser = (member) => {
     let avatar = member.user.displayAvatarURL({ size: 256, dynamic: true });
     let roles = member.roles.cache.map((role)=> role.name);
     let hasRole = roles.includes(targetRole)
+    let auditResult = member.auditResult;
     return {
         id,
         name,
         username,
         avatar,
         roles,
-        hasRole
+        hasRole,
+        auditResult
     };
 };
 class authController {
+    link(req, res){
+        res.json(authLink)
+    };
     async login(req, res) {
         try {
             const {idUser} = req;
@@ -48,17 +53,6 @@ class authController {
             res.status(400).json({message: 'Login error'})
         }
     };
-
-    async getUsers(req, res) {
-        try {
-            const users = {answer:listOfUsers.getUsersList()}
-            console.log('дошло')
-            res.json(users)
-        } catch (e) {
-            console.log(e)
-        }
-    };
-
     async getAdminData(req, res) {
         try {
             const data = listOfUsers.getUser(req.user.id);
@@ -69,38 +63,73 @@ class authController {
             console.log(e)
         }
     };
+
+    async getUsers(req, res) {
+        try {
+            const guildId = req.body.guild;
+            const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
+            const members = [];
+            (await guild.members.fetch()).forEach(((member) => {
+                if (!member.user.bot) {
+                    member.auditResult = null;
+                    members.push(makeUser(member))  
+                    }                                     
+            }));
+
+            
+            res.json(members)
+        } catch (e) {
+            console.log(e)
+        }
+    };
     async auditUsers(req, res) {
+        try {
+            const guildId = req.body.guild;
+            const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
+            const members = [];
+            (await guild.members.fetch()).forEach(((member) => {
+                if (!member.user.bot) {
+                    member.auditResult = null;
+                    members.push(makeUser(member))  
+                    }                                     
+            })); 
+       
+           await auditUsers(members);     
+            res.json(members)
+        } catch (e) {
+            console.log(e)
+        }
+    };
+    async fixUsers(req, res) {
         try {
             const target = req.body.target;
             const guildId = req.body.guild;
-            console.log('1')
-            // if (!target) {
-                const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
-
-                console.log('2')
-                const members = [];  
-
-                (await guild.members.fetch()).forEach((member => members.push(member)));
-                console.log('3')
-                for (let member of members){
-                        await checkUser(member)                                 
-                    }
-
-            
-                    console.log('4') 
-                let users = [];
-                let result = [];
-                (await guild.members.fetch()).forEach((member => users.push(member)));
-                console.log('3')
-                for (let user of users){
-                       if (!user.user.bot) {
-                       result.push(makeUser(user))  
-                       }                               
-                    }        
-            // const answer = {answer:makeUser(member)}
-            console.log('5')
-
-            res.json({answer:result} )
+            const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
+            const members = [];
+            const auditedMembers = [];
+            (await guild.members.fetch()).forEach((member) => {
+                if (!member.user.bot) { 
+                    let targetMember =  target.find(item => item.id == member.id)
+                    
+                    if (targetMember){
+                        console.log(targetMember)
+                        member.hasRole = targetMember.hasRole;
+                        console.log(member.user.username)
+                        members.push(member)
+                    }                     
+                }                                     
+            }); 
+            console.log('Исправляем..')
+            await fixUsers(members);  
+            console.log('Сделано');
+            (await guild.members.fetch()).forEach(async(member) => {
+                if (!member.user.bot) {
+                    member.auditResult = null;
+                    auditedMembers.push(makeUser(member))  
+                    }                                     
+            }); 
+            await auditUsers(auditedMembers);     
+            res.json(auditedMembers)
         } catch (e) {
             console.log(e)
         }

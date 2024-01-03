@@ -20,10 +20,21 @@ async function checkUser(member){
 async function auditUsers(members){
     try{
     let currentUsers = await getListMembers();
+    for (let member of members) { 
+        let name = member.name.split(' ')[0].toLowerCase();
+        member.auditResult = await currentUsers.includes(name) == member.hasRole;
+    } 
+}catch{
+    console.log('ошибка при проверке');
+    return 'Ошибка при проверке'
+}
+}
+
+
+async function fixUsers(members){
+    try{
     for (let member of members) {
-        if (member.user.bot) continue;  
-        let name = (member.nickname||member.user.globalName||member.user.username).split(' ')[0].toLowerCase();
-        return fixRole(currentUsers.includes(name), member)
+       await fixRole((!member.hasRole), member)
     } 
 
 }catch{
@@ -36,13 +47,13 @@ async function fixRole(roleIsFound,member){
     let answer = ''
     try{
         if (roleIsFound){
-            if (addRole(member)){
+            if (await addRole(member)){
                 answer += 'Является членом гильдии и ему назначена роль.'
             }else{
                 answer += `Роль ${targetRole} не найдена!`
             }
         } else{
-            if (removeRole(member)){	
+            if (await removeRole(member)){	
                 answer += 'Не является членом гильдии. Роль недоступна.'
             }else{
                 answer += `Роль ${targetRole} не найдена!`
@@ -59,31 +70,24 @@ async function removeRole(member){
     const role = await member.guild.roles.cache.find(channel => channel.name === targetRole);
     if (role ) {
         await member.roles.remove(role);
+        console.log('Удалил роль')
         return true
     }
 }
 async function addRole(member){
     const role = await member.guild.roles.cache.find(channel => channel.name === targetRole);
     if (role ) {
+        
         await member.roles.add(role);
+        console.log('Добавил роль')
         return true
     }
 }
-async function checkName(member){
-    // let name = (member.nickname||member.user.globalName||member.user.username).split(' ')[0];
-    // let currentUsers = await getListMembers();
-    // // for (let member of members) {
-    // //     if (member.user.bot) continue;
-    // try {
-    
-    //       }catch(err){
-    //         console.log(err.response.status);
-    //         return false
-    //       }
-}
     
 module.exports = {
-    checkUser
+    checkUser,
+    auditUsers,
+    fixUsers
 };
 
 
@@ -114,8 +118,10 @@ const response = await axios.get('https://eu.api.blizzard.com/data/wow/guild/eve
     'Authorization': 'Bearer '+token
   }
 });
+console.log('Есть данные с WOW Api')
 return response.data.members.map(item => item.character.name.toLowerCase())
     }catch {
+        console.log('Ошибка WOW Api')
         logger('Ошибка api проверки');
     }
 
@@ -138,3 +144,20 @@ return response.data.members.map(item => item.character.name.toLowerCase())
 //             return false
 //           }
 //         }
+
+
+
+
+
+// async function checkName(member){
+    // let name = (member.nickname||member.user.globalName||member.user.username).split(' ')[0];
+    // let currentUsers = await getListMembers();
+    // // for (let member of members) {
+    // //     if (member.user.bot) continue;
+    // try {
+    
+    //       }catch(err){
+    //         console.log(err.response.status);
+    //         return false
+    //       }
+// }

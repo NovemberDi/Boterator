@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 
 
-const { clientId, clientSecret, port } = require('../config.json');
+const { clientId, clientSecret, port, host } = require('../config.json');
 const { request } = require('undici');
 
 module.exports = async function (req, resp, next){
@@ -17,7 +17,7 @@ module.exports = async function (req, resp, next){
 					client_secret: clientSecret,
 					code,
 					grant_type: 'authorization_code',
-					redirect_uri: `http://192.168.0.105:${port}`,
+					redirect_uri: `${host}:${port}`,
 					scope: 'identify',
 				}).toString(),
 				headers: {

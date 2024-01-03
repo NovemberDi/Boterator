@@ -60,7 +60,7 @@ const listOfUsers = {
 
 };
 const adminData = {
-    admins: [],
+    admins: ['418346177587576832'],
     guilds:[],
     setAdminId(guild){
        this.admins.push(guild.ownerId) 
