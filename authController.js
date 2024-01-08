@@ -43,7 +43,9 @@ class authController {
             if (!idUser) {
                 return res.status(400).json({message: `Пользователь не найден`})
             }
-            if (idUser != adminData.getAdminId()[0]) {
+            console.log(adminData.getAdminId().includes(idUser));
+            if (!adminData.getAdminId().includes(idUser)) {
+                
                 return res.status(400).json({message: `Пользователь не является администратором`})
             }
             const token = generateAccessToken(idUser)
