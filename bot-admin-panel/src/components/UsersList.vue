@@ -1,10 +1,30 @@
 <template>
   <div class="wrap">
 
-    <ul class="list-users" >
+    <ul class="list-users">
       <div class="top-list">
         <div class="tools-panel">
-          <img class="reload btn animated" :class="{rotateBtn: waitData}" src="./../assets/reload.svg"  @click="auditUsers" alt="check" >
+          <img class="reload btn" v-show="!marckMode" :class="{rotateBtn: waitData}" src="./../assets/reload.svg"  @click="auditUsers" alt="check" >
+          <OtherBtn class="other"
+          @marckMode="marckMode = true"
+          ></OtherBtn>
+          <div class="markTools" v-show="marckMode">
+            <div class="all-check markTools-item">
+                <div class="check-box">
+                <input type="checkbox" @change="checkAll($event.target.checked)">
+                <span>✔</span>
+              </div>
+          </div>
+          <div class="fix-count markTools-item">
+            {{ checkedCount }}
+          </div>
+          <div class="fix-all markTools-item">
+            <img  src="./../assets/fix.svg"   alt="fix" >
+            Исправить</div>
+          <div class="checked-abort markTools-item" @click="abortMark">
+            <img  src="./../assets/abort.svg"   alt="abort" >
+            Отмена</div>
+          </div>
         </div>
         <li class="user" >
           <div class="number list-head"  >№</div>
@@ -13,9 +33,16 @@
         </li>
       </div>
       
-      <li class="user" v-for="user in result" :key="user.iuserID"> 
-         <div class="number">{{ result.indexOf(user)+1 }}) </div>
+      <li class="user"  v-for="user in result" :key="user.iuserID" :class="{loading: waitData}"> 
+         <div class="number" > 
+          <div v-show="!(marckMode && user.auditResult == false)">{{ result.indexOf(user)+1 }})</div>
+          <div class="check-box" v-show="marckMode && user.auditResult == false">
+              <input type="checkbox" v-model="user.checked" @change="countCheck">
+              <span>✔</span>
+          </div>
+         </div>
          <div class="user-name">
+
             <img class="avatar" :src="user.avatar" alt="">
             {{ user.name }}
         </div>
@@ -23,16 +50,21 @@
           <div class="role" :class="{hasrole: user.hasRole}"></div>
           <div class="check" >
             <img v-if="user.auditResult == true" src="./../assets/ok.svg" alt="ОК">
-            <img v-if="user.auditResult == false" src="./../assets/false.svg" alt="BAD">
-            <img v-if="user.auditResult == null" src="./../assets/not.svg" alt="NOT">
-          
+            <img v-if="user.auditResult == false" src="./../assets/false.svg" alt="BAD" @click="showModalFix(user)" class="badCheck"> 
+            <img v-if="user.auditResult == null" src="./../assets/not.svg" alt="NOT" >          
           </div>
          </div>
         
       </li>
     </ul>
 
-    
+    <ModalFix
+    v-show="modalFix.show" 
+    :user="modalFix.user"
+    @click.self="modalFix.show = false"
+    @closeModelaFix="modalFix.show = false"
+    @fixUsers="fixUsers"
+    ></ModalFix>
 
   </div>
 </template>
@@ -43,8 +75,14 @@ export default {
   name: 'UsersList',
   data(){
     return{
-      result: '',
+      result: [],
       waitData:false,
+      marckMode: false,
+      checkedCount: 0,
+      modalFix:{
+        show: false,
+        user:{},
+      },
       // guild: '1016758118421626902'
     }
   },
@@ -53,6 +91,32 @@ export default {
     domen: {type: String}
   },
   methods:{
+    countCheck(){
+      this.checkedCount =
+      this.result.reduce((count, user) => {
+        if(user.checked) return count+=1;
+        return count
+      }, 0)
+    },
+    abortMark(){
+      this.result.forEach(user => {
+        if (user.checked == true) user.checked = false;
+      });
+      this.marckMode = false;
+      this.countCheck();
+    },
+    checkAll(checked){
+      this.result.forEach(user => {
+        if (user.auditResult == false) user.checked = checked;
+        this.countCheck()
+      })
+    },
+    showModalFix(user){
+      if (this.waitData == true) return;
+      this.modalFix.show = true;
+      this.modalFix.user = user;
+    },
+
     async auditUsers(){
     this.waitData = true;
     console.log('ждем')
@@ -70,7 +134,7 @@ export default {
           }
         });
         console.log(answer.data);
-        this.result = answer.data.sort((a, b) => a.auditResult - b.auditResult); //сортируем по имени
+        this.result = answer.data.sort((a, b) => a.auditResult - b.auditResult); //сортируем по результату проверки
 
       }catch(err){
         console.log(err.response.status)
@@ -78,15 +142,17 @@ export default {
       }
     this.waitData = false;
     },
-    async fixUsers(){
+
+    async fixUsers(users){
+    this.waitData = true;
     console.log('ждем')
     let token = sessionStorage.getItem('token');
-    // console.log(token);
+    this.modalFix.show = false;
     let data = {
       target: [],
       guild: this.guild
     }
-    this.result.forEach((item) => {
+    users.forEach((item) => {
       if (item.auditResult) return;
       let {id, hasRole} = item;
       let user = {id, hasRole}
@@ -101,11 +167,12 @@ export default {
           }
         });
         console.log(answer.data);
-        this.result = answer.data
+        this.result = answer.data.sort((a, b) => a.auditResult - b.auditResult); //сортируем по результату проверки
       }catch(err){
         console.log(err.response.status)
         if (err.response.status == 403) this.$emit('logout')
       }
+      this.waitData = false;
     },
    async getUsers(){
     console.log('ждем')
@@ -138,16 +205,75 @@ export default {
   mounted(){
    
   },
+
   watch:{
     guild(){
       this.getUsers();
-    }
+    },
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.markTools{
+  display: flex;
+  justify-content: space-between;
+  position: absolute;
+  width: 85%;
+  top:8px;
+  left: 18px;;
+}
+.markTools-item{
+  margin-right: 5px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.all-check{
+
+}
+.checked-abort img{
+  height: 18px;
+  transform: translate(-5px, 0px);
+}
+.fix-all img{
+  height: 18px;
+  transform: translate(0px, -3px);
+}
+.check-box{
+  color: rgb(255, 255, 255);
+  position: relative;
+  /* top:8px;
+  left: 18px; */
+  border: #c1c1c1 2px solid;
+  border-radius: 4px;
+  height: 12px;
+  width: 12px;
+  overflow: hidden;
+}
+.check-box input{
+  position: relative;
+  opacity: 0;
+  z-index: 102;
+}
+.check-box span {
+  width: 100%;
+  position: absolute;
+  top:-4px;
+  left: 0;
+  font-size: 14px;
+  background-color: #b9a5fd;
+  display: none;
+}
+.check-box input:checked ~ span{
+  display: block;
+}
+
 @keyframes rotate {
   0% {
     transform: rotate(0deg)
@@ -161,28 +287,61 @@ export default {
   top: 0px;
   background-color: #2b2b2c;
 }
+/* Кнопки */
 .tools-panel{
   height: 30px;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  position: relative;
 }
 .btn{
   height: 18px;
   cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: absolute;
+  top:8px
+}
+.reload{
+  left:18px;
+}
+.other{
+  position: absolute;
+  top:8px;
+  right: 0;
 }
 .rotateBtn{
+  position: absolute;
   animation: linear rotate 2s infinite;
 }
-.reload:active {
+.btn:active {
   height: 16px;
+}
+.loading{
+  opacity: 0.6;
 }
 .check{
   height: 15px;
   width: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.badCheck{
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.badCheck:active{
+height: 17px;
+width: 17px;
 }
 .number{
   width: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .role-block{
 display: flex;
@@ -217,7 +376,6 @@ align-items: center;
 .wrap{
   width:350px;
   margin: 20px auto 0px auto ;
-  background-color: aquamarine;
   border-radius: 8px;
   background-color: #2b2b2c;
   overflow: hidden;

@@ -25,10 +25,11 @@ export default {
   name: 'AutorizatePage',
   data(){
       return {
-        isAutorizate: false,
+        isAutorizate: true,
         authLink: null,
         curentGuild: '',
-        domen:''
+        // domen:'',
+        domen:'http://192.168.0.105:53134',
 
              }
   },
@@ -105,6 +106,7 @@ export default {
       }
     },
     makeDomen(){
+      if(!this.domen)
       this.domen = window.location.origin;
     }
   },
