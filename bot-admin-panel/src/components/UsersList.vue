@@ -8,23 +8,12 @@
           <OtherBtn class="other"
           @marckMode="marckMode = true"
           ></OtherBtn>
-          <div class="markTools" v-show="marckMode">
-            <div class="all-check markTools-item">
-                <div class="check-box">
-                <input type="checkbox" @change="checkAll($event.target.checked)">
-                <span>✔</span>
-              </div>
-          </div>
-          <div class="fix-count markTools-item">
-            {{ checkedCount }}
-          </div>
-          <div class="fix-all markTools-item">
-            <img  src="./../assets/fix.svg"   alt="fix" >
-            Исправить</div>
-          <div class="checked-abort markTools-item" @click="abortMark">
-            <img  src="./../assets/abort.svg"   alt="abort" >
-            Отмена</div>
-          </div>
+          <MarkTools v-if="marckMode"
+          @abortMark="abortMark"
+          @fixCheckedUsers="fixCheckedUsers"
+          @checkAll="checkAll($event)"
+          :checkedCount="checkedCount"
+          ></MarkTools>
         </div>
         <li class="user" >
           <div class="number list-head"  >№</div>
@@ -36,10 +25,12 @@
       <li class="user"  v-for="user in result" :key="user.iuserID" :class="{loading: waitData}"> 
          <div class="number" > 
           <div v-show="!(marckMode && user.auditResult == false)">{{ result.indexOf(user)+1 }})</div>
-          <div class="check-box" v-show="marckMode && user.auditResult == false">
-              <input type="checkbox" v-model="user.checked" @change="countCheck">
-              <span>✔</span>
-          </div>
+          <CheckBox
+              v-show="marckMode && user.auditResult == false"
+              v-model="user.checked"
+              @update:modelValue="newValue => searchText = newValue"
+              @change="countCheck"
+          ></CheckBox>
          </div>
          <div class="user-name">
 
@@ -50,7 +41,7 @@
           <div class="role" :class="{hasrole: user.hasRole}"></div>
           <div class="check" >
             <img v-if="user.auditResult == true" src="./../assets/ok.svg" alt="ОК">
-            <img v-if="user.auditResult == false" src="./../assets/false.svg" alt="BAD" @click="showModalFix(user)" class="badCheck"> 
+            <img v-if="user.auditResult == false" src="./../assets/false.svg" alt="BAD" @click="showModalFix([user])" class="badCheck"> 
             <img v-if="user.auditResult == null" src="./../assets/not.svg" alt="NOT" >          
           </div>
          </div>
@@ -60,7 +51,7 @@
 
     <ModalFix
     v-show="modalFix.show" 
-    :user="modalFix.user"
+    :users="modalFix.users"
     @click.self="modalFix.show = false"
     @closeModelaFix="modalFix.show = false"
     @fixUsers="fixUsers"
@@ -81,7 +72,7 @@ export default {
       checkedCount: 0,
       modalFix:{
         show: false,
-        user:{},
+        users:[],
       },
       // guild: '1016758118421626902'
     }
@@ -91,6 +82,12 @@ export default {
     domen: {type: String}
   },
   methods:{
+    fixCheckedUsers(){
+      if (this.checkedCount == 0) return
+      let checkedUsers = this.result.filter(user => user.checked);
+      this.showModalFix(checkedUsers)
+
+    },
     countCheck(){
       this.checkedCount =
       this.result.reduce((count, user) => {
@@ -111,11 +108,12 @@ export default {
         this.countCheck()
       })
     },
-    showModalFix(user){
+    showModalFix(users){
       if (this.waitData == true) return;
       this.modalFix.show = true;
-      this.modalFix.user = user;
+      this.modalFix.users = users;
     },
+
 
     async auditUsers(){
     this.waitData = true;
@@ -148,6 +146,7 @@ export default {
     console.log('ждем')
     let token = sessionStorage.getItem('token');
     this.modalFix.show = false;
+    this.abortMark();
     let data = {
       target: [],
       guild: this.guild
@@ -208,7 +207,8 @@ export default {
 
   watch:{
     guild(){
-      this.getUsers();
+      // this.getUsers();
+      this.auditUsers();
     },
   }
 }
@@ -216,64 +216,6 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.markTools{
-  display: flex;
-  justify-content: space-between;
-  position: absolute;
-  width: 85%;
-  top:8px;
-  left: 18px;;
-}
-.markTools-item{
-  margin-right: 5px;
-  cursor: pointer;
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.all-check{
-
-}
-.checked-abort img{
-  height: 18px;
-  transform: translate(-5px, 0px);
-}
-.fix-all img{
-  height: 18px;
-  transform: translate(0px, -3px);
-}
-.check-box{
-  color: rgb(255, 255, 255);
-  position: relative;
-  /* top:8px;
-  left: 18px; */
-  border: #c1c1c1 2px solid;
-  border-radius: 4px;
-  height: 12px;
-  width: 12px;
-  overflow: hidden;
-}
-.check-box input{
-  position: relative;
-  opacity: 0;
-  z-index: 102;
-}
-.check-box span {
-  width: 100%;
-  position: absolute;
-  top:-4px;
-  left: 0;
-  font-size: 14px;
-  background-color: #b9a5fd;
-  display: none;
-}
-.check-box input:checked ~ span{
-  display: block;
-}
-
 @keyframes rotate {
   0% {
     transform: rotate(0deg)

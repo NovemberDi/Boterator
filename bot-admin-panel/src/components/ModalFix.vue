@@ -1,9 +1,9 @@
 <template>
     <div class="ModalFix-wrap">
         <div class="modal" >
-            <p class="question">Исправить пользователей:</p>
-            <div>
-                <div>{{ user.name||'Noname' }}</div>
+            <p class="question">Исправить пользователей: ({{ users.length }})</p>
+            <div class="users">
+                <div  v-for="user in users" :key="user.iuserID">{{ user.name||'Noname' }}</div>
             </div>
             <div class="answer">
                 <div class="apply btn" @click="fixUsers">Ок</div>
@@ -19,12 +19,12 @@
     export default {
         name: 'ModalFix',
         props:{
-            user:{type:Object, default: {name:'Пользователь'}},
+            users:{type:Object},
             
         },
         methods:{
             fixUsers(){
-                this.$emit('fixUsers', [this.user])
+                this.$emit('fixUsers', [...this.users])
             },
             closeModal(){
                 this.$emit('closeModelaFix')
@@ -34,6 +34,33 @@
 </script>
 
 <style scoped>
+.users{
+  list-style-type: none;
+  height: max-content;
+  max-height: 65vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+  padding: 8px 0;
+}
+.users::-webkit-scrollbar {
+  width: 6px;
+  background-color: transparent;
+}
+
+.users::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color:#9d9d9d;
+}
+
+.users::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+  border-radius: 8px;
+  background-color: #20202000;
+}
+
+
+
 .ModalFix-wrap{
     background-color:#b9a5fd1e;
     color: #2b2b2c;
@@ -60,7 +87,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 .btn{
     margin: 8px;

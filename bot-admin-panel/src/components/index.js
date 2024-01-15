@@ -3,8 +3,8 @@ import MyAuth from '@/components/MyAuth.vue'
 import UsersList  from '@/components/UsersList.vue'
 import ModalFix from '@/components/ModalFix.vue'
 import OtherBtn from '@/components/UI/OtherBtn.vue'
-
-
+import MarkTools from '@/components/UI/MarkTools.vue'
+import CheckBox from '@/components/UI/CheckBox.vue'
 
 
 export default[
@@ -13,4 +13,6 @@ export default[
     UsersList,
     ModalFix,
     OtherBtn,
+    MarkTools,
+    CheckBox,
 ]
