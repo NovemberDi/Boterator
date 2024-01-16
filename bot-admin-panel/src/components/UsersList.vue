@@ -264,8 +264,8 @@ export default {
 
   watch:{
     guild(){
-      this.getUsers();
-      // this.auditUsers();
+      // this.getUsers();
+      this.auditUsers();
     },
   }
 }
@@ -296,6 +296,7 @@ height: 16px;
   position: sticky;
   top: 0px;
   background-color: #2b2b2c;
+  z-index: 1;
 }
 /* Кнопки */
 .tools-panel{

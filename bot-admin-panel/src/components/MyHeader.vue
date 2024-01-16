@@ -143,6 +143,7 @@ header{
   position: relative;
   justify-content: left;
   align-items:flex-end;
+  z-index: 200;
 }
 .logo{
   font-size: 24px;
