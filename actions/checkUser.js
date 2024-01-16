@@ -83,7 +83,7 @@ async function addRole(member){
         return true
     }
 }
-    
+
 module.exports = {
     checkUser,
     auditUsers,

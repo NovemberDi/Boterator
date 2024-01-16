@@ -40,7 +40,7 @@
   max-height: 65vh;
   overflow-y: scroll;
   overflow-x: hidden;
-  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.2);
   padding: 8px 0;
 }
 .users::-webkit-scrollbar {

@@ -12,6 +12,8 @@ router.post('/auditUsers', authMiddleware, controller.auditUsers)
 
 router.post('/getUsers', authMiddleware, controller.getUsers)
 router.post('/fixUsers', authMiddleware, controller.fixUsers)
+router.post('/changeNickname', authMiddleware, controller.changeNickname)
+
 router.get('/adminData', authMiddleware, controller.getAdminData)
 
 module.exports = router

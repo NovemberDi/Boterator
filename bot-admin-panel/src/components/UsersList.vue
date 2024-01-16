@@ -4,7 +4,8 @@
     <ul class="list-users">
       <div class="top-list">
         <div class="tools-panel">
-          <img class="reload btn" v-show="!marckMode" :class="{rotateBtn: waitData}" src="./../assets/reload.svg"  @click="auditUsers" alt="check" >
+          <img class="reload btn" v-show="!marckMode" :class="{rotateBtn: waitData}" src="./../assets/reload.svg"  @click="auditUsers" alt="check">
+          <img v-show="warning" class="warn" src="./../assets/warning.svg" alt="WARN">
           <OtherBtn class="other"
           @marckMode="marckMode = true"
           ></OtherBtn>
@@ -33,9 +34,11 @@
           ></CheckBox>
          </div>
          <div class="user-name">
-
+          <div>
             <img class="avatar" :src="user.avatar" alt="">
             {{ user.name }}
+          </div>  
+            <img class="edit" src="./../assets/pencil.svg" @click="showModalEdit(user)" alt="EDIT">
         </div>
          <div class="role-block">
           <div class="role" :class="{hasrole: user.hasRole}"></div>
@@ -56,7 +59,12 @@
     @closeModelaFix="modalFix.show = false"
     @fixUsers="fixUsers"
     ></ModalFix>
-
+    <modalEdit
+    v-if="modalEdit.show"
+    :user="modalEdit.user"
+    @closeModelaEdit="closeModelaEdit"
+    @changeNickname="changeNickname"
+    ></modalEdit>
   </div>
 </template>
 
@@ -69,11 +77,16 @@ export default {
       result: [],
       waitData:false,
       marckMode: false,
+      warning: false,
       checkedCount: 0,
       modalFix:{
         show: false,
         users:[],
       },
+      modalEdit:{
+        show: false,
+        user:{},
+      }
       // guild: '1016758118421626902'
     }
   },
@@ -82,6 +95,44 @@ export default {
     domen: {type: String}
   },
   methods:{
+    async changeNickname(event){
+    this.waitData = true;
+    this.closeModelaEdit();
+
+    let token = sessionStorage.getItem('token');
+    
+    let data = {
+      target: event,
+      guild: this.guild
+    }
+
+    console.log(data.target)
+    if (!token) return
+      try{
+        let answer = await axios.post(this.domen+'/auth/changeNickname',data,{
+          headers: {
+            Authorization: 'Bearer ' + token
+          }
+        });
+        console.log(answer.data);
+        
+        this.result.forEach((user) => {
+          if (answer.data.userId == user.id){
+            user.name = answer.data.nickname
+          }
+        });
+        this.warning = true;
+      }catch(err){
+        console.log(err.response.status)
+        if (err.response.status == 403) this.$emit('logout')
+      }
+      this.waitData = false;
+    },
+
+    closeModelaEdit(){
+      this.modalEdit.show = false;
+      this.modalEdit.user = {};
+    },
     fixCheckedUsers(){
       if (this.checkedCount == 0) return
       let checkedUsers = this.result.filter(user => user.checked);
@@ -108,6 +159,11 @@ export default {
         this.countCheck()
       })
     },
+    showModalEdit(user){
+      if (this.waitData == true) return;
+      this.modalEdit.show = true;
+      this.modalEdit.user = user;
+    },
     showModalFix(users){
       if (this.waitData == true) return;
       this.modalFix.show = true;
@@ -116,6 +172,7 @@ export default {
 
 
     async auditUsers(){
+    this.warning = false;
     this.waitData = true;
     console.log('ждем')
     let token = sessionStorage.getItem('token');
@@ -207,8 +264,8 @@ export default {
 
   watch:{
     guild(){
-      // this.getUsers();
-      this.auditUsers();
+      this.getUsers();
+      // this.auditUsers();
     },
   }
 }
@@ -216,6 +273,17 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+.edit{
+  height: 18px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  justify-self: flex-end;
+}
+.edit:active{
+height: 16px;
+}
 @keyframes rotate {
   0% {
     transform: rotate(0deg)
@@ -246,6 +314,16 @@ export default {
 }
 .reload{
   left:18px;
+}
+.warn{
+  height: 18px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: absolute;
+  top:8px;
+  left:36px;
 }
 .other{
   position: absolute;
@@ -340,9 +418,12 @@ align-items: center;
   /* margin: 5px; */
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
 }
-
+.user-name div{
+  display: flex;
+  align-items: center;
+}
 .list-head{
   border-bottom: #b9a5fd solid 1px;
   display: flex;

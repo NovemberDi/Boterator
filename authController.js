@@ -136,6 +136,20 @@ class authController {
             console.log(e)
         }
     };
+    async changeNickname(req, res) {
+        try {
+            const guildId = req.body.guild;
+            const targetId = req.body.target.id;
+            const newNickname = req.body.target.newNickname;
+            const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
+            let member = (await guild.members.fetch()).find(member => member.id == targetId) 
+            let result = await member.setNickname(newNickname, 'by Bot');
+            res.json(result)
+        } catch (e) {
+            console.log(e)
+            res.json(e)
+        }
+    };
 }
 
 module.exports = new authController()

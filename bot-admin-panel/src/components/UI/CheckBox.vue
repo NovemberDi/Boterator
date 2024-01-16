@@ -30,8 +30,13 @@
 }
 .check-box input{
   cursor: pointer;
-  position: relative;
+  position: absolute;
+  background-color: aquamarine;
+  top: -5px;
+  left:-5px;
   opacity: 0;
+  height: 22px;
+  width: 22px;
   z-index: 102;
 }
 .check-box span {

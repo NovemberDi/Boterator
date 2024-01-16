@@ -5,7 +5,7 @@ import ModalFix from '@/components/ModalFix.vue'
 import OtherBtn from '@/components/UI/OtherBtn.vue'
 import MarkTools from '@/components/UI/MarkTools.vue'
 import CheckBox from '@/components/UI/CheckBox.vue'
-
+import ModalEdit from '@/components/ModalEdit.vue'
 
 export default[
     MyHeader,
@@ -15,4 +15,5 @@ export default[
     OtherBtn,
     MarkTools,
     CheckBox,
+    ModalEdit,
 ]
