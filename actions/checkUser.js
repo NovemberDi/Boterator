@@ -1,4 +1,4 @@
-let { targetRole, checkLink, nameOfWowGuild } = require('./../bot-params.json');
+let { targetRole, nameOfWowGuild, apiUsername, apiPassword } = require('./../config.json');
 const axios = require('axios');
 // const cheerio = require('cheerio');
 
@@ -96,34 +96,33 @@ async function getListMembers(){
     console.log('ждём данные с WOW Api')
     try{
     let responseToken = await axios.post(
-  'https://oauth.battle.net/token',
-  new URLSearchParams({
-    'grant_type': 'client_credentials'
-  }),
-  {
-    auth: {
-      username: '00e989c3a3694449bf28280452091382',
-      password: 'gSBpwPDYEm5kugO403NmGWxuJvQNqjdH'
+    'https://oauth.battle.net/token',
+    new URLSearchParams({
+        'grant_type': 'client_credentials'
+    }),
+    {
+        auth: {
+        username: apiUsername,
+        password: apiPassword
+        }
+    });
+    token = responseToken.data.access_token
+    // console.log(token)
+    const response = await axios.get('https://eu.api.blizzard.com/data/wow/guild/eversong/'+nameOfWowGuild+'/roster', {
+    params: {
+        'namespace': 'profile-eu',
+        'locale': 'ru_RU'
+    },
+    headers: {
+        'Authorization': 'Bearer '+token
     }
-  }
-);
-token = responseToken.data.access_token
-// console.log(token)
-const response = await axios.get('https://eu.api.blizzard.com/data/wow/guild/eversong/демоны-семи-грехов/roster', {
-  params: {
-    'namespace': 'profile-eu',
-    'locale': 'ru_RU'
-  },
-  headers: {
-    'Authorization': 'Bearer '+token
-  }
-});
-console.log('Есть данные с WOW Api')
-return response.data.members.map(item => item.character.name.toLowerCase())
-    }catch {
-        console.log('Ошибка WOW Api')
-        logger('Ошибка api проверки');
-    }
+    });
+    console.log('Есть данные с WOW Api')
+    return response.data.members.map(item => item.character.name.toLowerCase())
+        }catch {
+            console.log('Ошибка WOW Api')
+            logger('Ошибка api проверки');
+        }
 
 }
 

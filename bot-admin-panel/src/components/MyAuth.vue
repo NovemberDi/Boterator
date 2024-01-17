@@ -7,8 +7,8 @@
         Авторизация
     </div>
     <img class="user-img" src="./../assets/Boter.png" alt="User">
-    <a  v-show="authLink"  class="btn"   :href="`${authLink} `">Войти с Discord</a>
-
+    <a  v-show="authLink && !authLoading"  class="btn"   :href="`${authLink} `">Войти с Discord</a>
+    <MyPreloader class="user-img" v-show="authLoading"></MyPreloader>
 </div>
 </template>
 <script>
@@ -16,11 +16,12 @@
         name: 'MyAuth',
         data(){
             return {
-            
+
                 }
         },
         props: {
             authLink: {Type: String},
+            authLoading:{Type: Boolean}
         },
         methods:{
         

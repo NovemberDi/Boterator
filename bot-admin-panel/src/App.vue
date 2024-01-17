@@ -1,6 +1,7 @@
 <template>
   <MyAuth  v-if="!isAutorizate"
   :authLink="authLink"
+  :authLoading="authLoading"
   ></MyAuth>
 
   <div v-if="isAutorizate">
@@ -27,6 +28,7 @@ export default {
       return {
         isAutorizate: false,
         authLink: null,
+        authLoading: false,
         curentGuild: '',
         domen:'',
         // domen:'http://192.168.0.105:53134',
@@ -69,12 +71,12 @@ export default {
       if (sessionStorage.getItem('oauth-state') !== atob(decodeURIComponent(state))) {
 				return console.log('You may have been click-jacked!');
 			}
-      // this.isAutorizate = true;
         this.getToken(code);
         return console.log('Успех');
         
     },
     async getToken(code){
+      this.authLoading = true;
       try{
       let data = await (await axios.post(this.domen+'/auth/login', {code})).data
       // console.log(data)
@@ -92,6 +94,7 @@ export default {
         this.logout();
 
       }
+      this.authLoading = false;
     },
     logout(){
       sessionStorage.clear();

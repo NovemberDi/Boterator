@@ -1,5 +1,5 @@
 <template>
-          <div class="check-box" >
+          <div class="check-box" id="check-box">
               <input type="checkbox" :checked="modelValue" @input="$emit('update:modelValue', $event.target.checked)" >
               <!-- @change="$emit('change', $event.target.checked)" -->
               <span>✔</span>
@@ -25,13 +25,15 @@
   border-radius: 4px;
   height: 12px;
   width: 12px;
-  overflow: hidden;
-  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  justify-self: flex-end;
+
 }
 .check-box input{
   cursor: pointer;
   position: absolute;
-  background-color: aquamarine;
   top: -5px;
   left:-5px;
   opacity: 0;
@@ -45,10 +47,14 @@
   top:-4px;
   left: 0;
   font-size: 14px;
-  background-color: #b9a5fd;
   display: none;
+}
+.check-box:has(input:checked)  {
+  background-color: #b9a5fd;
+  
 }
 .check-box input:checked ~ span{
   display: block;
 }
+
 </style>

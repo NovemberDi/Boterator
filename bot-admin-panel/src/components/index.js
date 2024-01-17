@@ -6,6 +6,8 @@ import OtherBtn from '@/components/UI/OtherBtn.vue'
 import MarkTools from '@/components/UI/MarkTools.vue'
 import CheckBox from '@/components/UI/CheckBox.vue'
 import ModalEdit from '@/components/ModalEdit.vue'
+import MyPreloader from '@/components/UI/MyPreloader.vue'
+
 
 export default[
     MyHeader,
@@ -16,4 +18,5 @@ export default[
     MarkTools,
     CheckBox,
     ModalEdit,
+    MyPreloader,
 ]

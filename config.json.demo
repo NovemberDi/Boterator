@@ -1,9 +1,19 @@
 {
-	"clientId": "clientIdDiscord",
-	"clientSecret": "clientSecretDiscord",
-	"port": "port",
-	"secret": "secretForJWT", 
+	"clientId": "YOUR CLIENT ID DISCORD",
+	"clientSecret": "YOUR CLIENT SECRET DISCORD",
+	"token": "YOUR CLIENT TOKEN DISCORD",
 
-	"token": "tokenDiscord"
+	"authLink": "YOUR CLIENT OAUTH2 LINK FROM DISCORD"
+
+	"host": "YOUR SERVER HOST like -> http://192.168.0.105",
+	"port": YOUR SERVER HOST PORT,
+	"secret": "YOUR SECRET FOR JWT",
+
+	"targetRole": "YOUR TARGET ROLE NAME FROM DISCORD GUILD",
+
+	"nameOfWowGuild": "YOUR WARCRAFT GUILD NAME like -> any-part-name",
+
+	"apiUsername": "YOUR CLIENT ID FROM develop.battle.net",
+	"apiPassword": "YOUR CLIENT SECRETE FROM develop.battle.net"
     
 }
