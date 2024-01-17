@@ -1,5 +1,5 @@
 <template>
-    <div class="ModalEdit-wrap">
+    <div class="ModalEdit-wrap" @click.self="closeModal">
         <div class="modal" >
             <p class="question">Именить никнейм:</p>
             <div class="users">
@@ -103,6 +103,7 @@
     left: 0;
     height: 100vh;
     width: 100vw;
+    z-index: 10;
 }
 .modal{
     height: fit-content;

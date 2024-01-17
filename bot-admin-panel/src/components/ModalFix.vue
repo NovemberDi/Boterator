@@ -1,5 +1,5 @@
 <template>
-    <div class="ModalFix-wrap">
+    <div class="ModalFix-wrap" @click.self="closeModal">
         <div class="modal" >
             <p class="question">Исправить пользователей: ({{ users.length }})</p>
             <div class="users">
@@ -69,6 +69,7 @@
     left: 0;
     height: 100vh;
     width: 100vw;
+    z-index: 10;
 }
 .modal{
     height: fit-content;

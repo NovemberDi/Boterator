@@ -55,7 +55,7 @@
     <ModalFix
     v-show="modalFix.show" 
     :users="modalFix.users"
-    @click.self="modalFix.show = false"
+    
     @closeModelaFix="modalFix.show = false"
     @fixUsers="fixUsers"
     ></ModalFix>
