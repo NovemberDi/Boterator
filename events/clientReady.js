@@ -1,6 +1,6 @@
 //Событие логина
 const { Events, ChannelType } = require('discord.js');
-const {listOfUsers, adminData} = require('../store/store.js');
+const {adminData} = require('../store/store.js');
 
 const logger = require('../actions/logger.js');
 
@@ -11,15 +11,9 @@ module.exports = {
 		logger('Бот онлайн');
 		console.log(`Ready! Logged in as ${client.user.tag}`);
 	    const Guilds = client.guilds.cache.map(guild => guild); // Получаем список серверов
-		//Проходимся по списку серверов и добавляем пользователей в стор
+		//Проходимся по списку серверов и добавляем админа в стор
 	    Guilds.forEach(guild => {
 			adminData.setAdminId(guild);
-	        // const guild = client.guilds.cache.get(item.id);
-	        guild.members.fetch()
-		        .then(members =>{
-					members.forEach(member => listOfUsers.addUser(member))
-		        })
-                .catch(console.error);
 		});
 		
 		

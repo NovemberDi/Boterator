@@ -2,8 +2,7 @@ const {client} = require('./bot.js')
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const {fixUsers, auditUsers} = require("./actions/checkUser.js");
-let { targetRole } = require('./bot-params.json');
-const {secret, authLink} = require("./config");
+const {targetRole, secret, authLink} = require("./config");
 const {listOfUsers, adminData} = require('./store/store.js')
 
 
@@ -57,10 +56,17 @@ class authController {
     };
     async getAdminData(req, res) {
         try {
-            const data = listOfUsers.getUser(req.user.id);
-            data.guilds = adminData.getGuilds();
+            const guilds = adminData.getGuilds();
+            const guildId = guilds[0].guildID;
+           
+            const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
+            const member = (await guild.members.fetch()).find(((member) => member.id == req.user.id ));
+            const admin = makeUser(member);
+           
+            admin.guilds = guilds;
+            
             console.log('дошло')
-            res.json(data)
+            res.json(admin)
         } catch (e) {
             console.log(e)
         }
