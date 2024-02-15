@@ -10,7 +10,7 @@ module.exports = {
 		console.log(`Пользователь ${interaction.nickname?interaction.nickname:interaction.user.username} покинул сервер ${interaction.guild.name}`);
 		channel.send(`>>> ### Событие на сервере — пользователь покинул сервер *${interaction.guild.name}*
 		* Глобальное имя - ***${interaction.user.username}***
-		* Никнейм на сервере - ***${interaction.nickname}***.
+		* Никнейм на сервере - ***${interaction.nickname || 'отсутствовал'}***.
 		`);
 
 		},
