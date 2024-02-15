@@ -11,8 +11,9 @@ module.exports = {
 		logger('Новый ползователь ' + interaction.user.username)
 		const channel = interaction.guild.channels.cache.find(channel => channel.name === "server_events");
 
-		channel.send(`Пользователь ${interaction.nickname?interaction.nickname:interaction.user.username}  (<@${interaction.user.id}>) добавлен на сервер ${interaction.guild.name}.
-		${await checkUser(interaction)}`)
+		channel.send(`>>> ### Событие на сервере — новый пользователь!
+		* пользователь ***${interaction.nickname?interaction.nickname:interaction.user.username}*** __<@${interaction.user.id}>__ добавлен на сервер ***${interaction.guild.name}***.
+		* ${await checkUser(interaction)}`)
 		// console.log(`Пользователь ${interaction.nickname?interaction.nickname:interaction.user.username} добавлен на сервер ${interaction.guild.name}`) 
 	},
 };

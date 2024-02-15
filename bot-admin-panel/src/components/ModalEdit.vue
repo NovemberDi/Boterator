@@ -1,7 +1,7 @@
 <template>
     <div class="ModalEdit-wrap" @click.self="closeModal">
         <div class="modal" >
-            <p class="question">Именить никнейм:</p>
+            <p class="question">Изменить никнейм:</p>
             <div class="users">
                 {{ user.name||'Noname' }}
                 <input class="input-nickname" type="text" v-model="newNickname" placeholder="Новый никнейм">

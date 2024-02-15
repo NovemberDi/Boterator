@@ -14,10 +14,10 @@ module.exports = {
 		
 		const channel = newMember.guild.channels.cache.find(channel => channel.name === "server_events");
 		
-		let answer = `Событие на сервере — пользователь сменил никнейм:
-		Глобальное имя - ${newMember.user.username}
-		Ссылка - (<@${newMember.user.id}>)
-		Никнейм на сервере - ${newMember.nickname}.
+		let answer = `>>> ### Событие на сервере — пользователь сменил никнейм:
+		* Глобальное имя - ***${newMember.user.username}***
+		* Ссылка - <@${newMember.user.id}>
+		* Никнейм на сервере - ***${newMember.nickname}***.
 		`;
 		channel.send(answer + await checkUser(newMember));
 	},		
