@@ -12,6 +12,7 @@
 	"targetRole": "YOUR TARGET ROLE NAME FROM DISCORD GUILD",
 
 	"nameOfWowGuild": "YOUR WARCRAFT GUILD NAME like -> any-part-name",
+	"nameOfWowServer": "YOUR WARCRAFT SERVER NAME like -> any-part-name",
 
 	"apiUsername": "YOUR CLIENT ID FROM develop.battle.net",
 	"apiPassword": "YOUR CLIENT SECRETE FROM develop.battle.net"

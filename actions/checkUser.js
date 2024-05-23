@@ -1,4 +1,4 @@
-let { targetRole, nameOfWowGuild, apiUsername, apiPassword } = require('./../config.json');
+let { targetRole, nameOfWowGuild, nameOfWowServer, apiUsername, apiPassword } = require('./../config.json');
 const axios = require('axios');
 // const cheerio = require('cheerio');
 
@@ -108,7 +108,7 @@ async function getListMembers(){
     });
     token = responseToken.data.access_token
     // console.log(token)
-    const response = await axios.get('https://eu.api.blizzard.com/data/wow/guild/eversong/'+nameOfWowGuild+'/roster', {
+    const response = await axios.get(`https://eu.api.blizzard.com/data/wow/guild/${nameOfWowServer}/${nameOfWowGuild}/roster`, {
     params: {
         'namespace': 'profile-eu',
         'locale': 'ru_RU'
