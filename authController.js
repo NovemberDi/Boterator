@@ -31,6 +31,11 @@ let makeUser = (member) => {
         auditResult
     };
 };
+const getMembersFromDiscord = async (guild) => {
+
+const membersList = await guild.members.fetch({limit: 300});
+    return membersList
+}
 class authController {
     link(req, res){
         res.json(authLink)
@@ -60,7 +65,7 @@ class authController {
             const guildId = guilds[0].guildID;
            
             const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
-            const member = (await guild.members.fetch()).find(((member) => member.id == req.user.id ));
+            const member = (await getMembersFromDiscord(guild)).find(((member) => member.id == req.user.id ));
             const admin = makeUser(member);
            
             admin.guilds = guilds;
@@ -77,7 +82,7 @@ class authController {
             const guildId = req.body.guild;
             const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
             const members = [];
-            (await guild.members.fetch()).forEach(((member) => {
+            (await getMembersFromDiscord(guild)).forEach(((member) => {
                 if (!member.user.bot) {
                     member.auditResult = null;
                     members.push(makeUser(member))  
@@ -91,17 +96,19 @@ class authController {
         }
     };
     async auditUsers(req, res) {
+        console.log('auditUsers start..');
         try {
             const guildId = req.body.guild;
             const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
             const members = [];
-            (await guild.members.fetch()).forEach(((member) => {
+           console.log('Получаем список членов гильдии Discord');
+            (await getMembersFromDiscord(guild)).forEach(((member) => {
                 if (!member.user.bot) {
                     member.auditResult = null;
                     members.push(makeUser(member))  
                     }                                     
             })); 
-       
+       console.log('Проверка членов гильдии');
            await auditUsers(members);     
             res.json(members)
         } catch (e) {
@@ -130,7 +137,7 @@ class authController {
             console.log('Исправляем..')
             await fixUsers(members);  
             console.log('Сделано');
-            (await guild.members.fetch()).forEach(async(member) => {
+            (await getMembersFromDiscord(guild)).forEach(async(member) => {
                 if (!member.user.bot) {
                     member.auditResult = null;
                     auditedMembers.push(makeUser(member))  
@@ -148,7 +155,7 @@ class authController {
             const targetId = req.body.target.id;
             const newNickname = req.body.target.newNickname;
             const guild = client.guilds.cache.find((guild) => {return guild.id == guildId}); 
-            let member = (await guild.members.fetch()).find(member => member.id == targetId) 
+            let member = (await getMembersFromDiscord(guild)).find(member => member.id == targetId) 
             let result = await member.setNickname(newNickname, 'by Bot');
             res.json(result)
         } catch (e) {
